@@ -54,6 +54,10 @@ class EpisodeBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
 
+        binding.downloadButton.setOnClickListener {
+            viewModel.download(args.episodeId)
+        }
+
         viewModel.item.observe(viewLifecycleOwner, { episode ->
             if (episode.userData?.playedPercentage != null) {
                 binding.progressBar.layoutParams.width = TypedValue.applyDimension(

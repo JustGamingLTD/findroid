@@ -8,6 +8,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import dev.jdtech.jellyfin.adapters.*
 import dev.jdtech.jellyfin.api.JellyfinApi
 import dev.jdtech.jellyfin.database.Server
+import dev.jdtech.jellyfin.models.DownloadSection
 import dev.jdtech.jellyfin.models.FavoriteSection
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemPerson
@@ -166,5 +167,11 @@ fun bindSeasonPoster(imageView: ImageView, seasonId: UUID) {
 @BindingAdapter("favoriteSections")
 fun bindFavoriteSections(recyclerView: RecyclerView, data: List<FavoriteSection>?) {
     val adapter = recyclerView.adapter as FavoritesListAdapter
+    adapter.submitList(data)
+}
+
+@BindingAdapter("downloadSections")
+fun bindDownloadSections(recyclerView: RecyclerView, data: List<DownloadSection>?) {
+    val adapter = recyclerView.adapter as DownloadsListAdapter
     adapter.submitList(data)
 }

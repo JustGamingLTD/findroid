@@ -141,6 +141,10 @@ constructor(
         _favorite.value = false
     }
 
+    fun download(itemId: UUID){
+        Timber.d("DOWNLOAD BUTTON CLICKED")
+    }
+
     private fun getDateString(item: BaseItemDto): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val instant = item.premiereDate?.toInstant(ZoneOffset.UTC)
