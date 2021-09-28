@@ -55,7 +55,7 @@ class EpisodeBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         binding.downloadButton.setOnClickListener {
-            viewModel.download(args.episodeId)
+            viewModel.download(args.episodeId, this)
         }
 
         viewModel.item.observe(viewLifecycleOwner, { episode ->
