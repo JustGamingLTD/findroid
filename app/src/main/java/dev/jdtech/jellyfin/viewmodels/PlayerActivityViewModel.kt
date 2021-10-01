@@ -96,7 +96,12 @@ constructor(
 
             try {
                 for (item in items) {
-                    val streamUrl = jellyfinRepository.getStreamUrl(item.itemId, item.mediaSourceId)
+                    val streamUrl = if(item.mediaSourceUri.isEmpty()){
+                        jellyfinRepository.getStreamUrl(item.itemId, item.mediaSourceId)
+                    }else{
+                        item.mediaSourceUri
+                    }
+
                     Timber.d("Stream url: $streamUrl")
                     val mediaItem =
                         MediaItem.Builder()

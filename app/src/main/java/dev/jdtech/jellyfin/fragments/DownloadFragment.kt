@@ -9,12 +9,16 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jdtech.jellyfin.R
+import dev.jdtech.jellyfin.adapters.DownloadEpisodeListAdapter
 import dev.jdtech.jellyfin.adapters.DownloadsListAdapter
 import dev.jdtech.jellyfin.adapters.HomeEpisodeListAdapter
 import dev.jdtech.jellyfin.adapters.ViewItemListAdapter
 import dev.jdtech.jellyfin.databinding.FragmentDownloadBinding
 import dev.jdtech.jellyfin.dialogs.ErrorDialogFragment
+import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.utils.checkIfLoginRequired
+import dev.jdtech.jellyfin.utils.loadDownloadedEpisodes
+import dev.jdtech.jellyfin.utils.requestDownload
 import dev.jdtech.jellyfin.viewmodels.DownloadViewModel
 import org.jellyfin.sdk.model.api.BaseItemDto
 
@@ -34,9 +38,9 @@ class DownloadFragment : Fragment() {
         binding.viewModel = viewModel
         binding.downloadsRecyclerView.adapter = DownloadsListAdapter(
             ViewItemListAdapter.OnClickListener { item ->
-                navigateToMediaInfoFragment(item)
-            }, HomeEpisodeListAdapter.OnClickListener { item ->
-                navigateToEpisodeBottomSheetFragment(item)
+                //navigateToMediaInfoFragment(item) //TODO MAKE THIS FUNCTION WORK WITH PALYERITEM
+            }, DownloadEpisodeListAdapter.OnClickListener { item ->
+                navigateToEpisodeBottomSheetFragment(item) //TODO MAKE THIS FUNCTION WORK WITH PLAYERITEM
             })
 
         viewModel.finishedLoading.observe(viewLifecycleOwner, { isFinished ->
@@ -70,6 +74,8 @@ class DownloadFragment : Fragment() {
             }
         })
 
+        //loadDownloadedEpisodes()
+
         return binding.root
     }
 
@@ -83,10 +89,11 @@ class DownloadFragment : Fragment() {
         )
     }
 
-    private fun navigateToEpisodeBottomSheetFragment(episode: BaseItemDto) {
+    private fun navigateToEpisodeBottomSheetFragment(episode: PlayerItem) {
         findNavController().navigate(
-            FavoriteFragmentDirections.actionFavoriteFragmentToEpisodeBottomSheetFragment(
-                episode.id
+            DownloadFragmentDirections.actionDownloadFragmentToEpisodeBottomSheetFragment(
+                null,
+                episode
             )
         )
     }

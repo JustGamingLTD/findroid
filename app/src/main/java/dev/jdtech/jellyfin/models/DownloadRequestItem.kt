@@ -5,10 +5,8 @@ import kotlinx.parcelize.Parcelize
 import java.util.*
 
 @Parcelize
-data class PlayerItem(
-    val name: String?,
+data class DownloadRequestItem(
+    val uri: String,
     val itemId: UUID,
-    val mediaSourceId: String,
-    val playbackPosition: Long,
-    val mediaSourceUri: String = ""
+    val title: String,
 ) : Parcelable

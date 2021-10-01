@@ -1,5 +1,6 @@
 package dev.jdtech.jellyfin.fragments
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -7,15 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.exoplayer2.Player
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jdtech.jellyfin.R
 import dev.jdtech.jellyfin.databinding.EpisodeBottomSheetBinding
 import dev.jdtech.jellyfin.dialogs.ErrorDialogFragment
 import dev.jdtech.jellyfin.models.PlayerItem
+import dev.jdtech.jellyfin.utils.loadDownloadedEpisodes
+import dev.jdtech.jellyfin.utils.requestDownload
 import dev.jdtech.jellyfin.viewmodels.EpisodeBottomSheetViewModel
+import kotlinx.coroutines.launch
+import java.util.*
 
 @AndroidEntryPoint
 class EpisodeBottomSheetFragment : BottomSheetDialogFragment() {
@@ -38,24 +45,6 @@ class EpisodeBottomSheetFragment : BottomSheetDialogFragment() {
             binding.playButton.setImageResource(android.R.color.transparent)
             binding.progressCircular.visibility = View.VISIBLE
             viewModel.preparePlayerItems()
-        }
-
-        binding.checkButton.setOnClickListener {
-            when (viewModel.played.value) {
-                true -> viewModel.markAsUnplayed(args.episodeId)
-                false -> viewModel.markAsPlayed(args.episodeId)
-            }
-        }
-
-        binding.favoriteButton.setOnClickListener {
-            when (viewModel.favorite.value) {
-                true -> viewModel.unmarkAsFavorite(args.episodeId)
-                false -> viewModel.markAsFavorite(args.episodeId)
-            }
-        }
-
-        binding.downloadButton.setOnClickListener {
-            viewModel.download(args.episodeId, this)
         }
 
         viewModel.item.observe(viewLifecycleOwner, { episode ->
@@ -107,6 +96,13 @@ class EpisodeBottomSheetFragment : BottomSheetDialogFragment() {
             }
         })
 
+        viewModel.downloadEpisode.observe(viewLifecycleOwner, {
+            if (it) {
+                requestDownload(Uri.parse(viewModel.downloadRequestItem.uri), viewModel.downloadRequestItem.title, viewModel.downloadRequestItem.title)
+                viewModel.doneDownloadEpisode()
+            }
+        })
+
         viewModel.playerItemsError.observe(viewLifecycleOwner, { errorMessage ->
             if (errorMessage != null) {
                 binding.playerItemsError.visibility = View.VISIBLE
@@ -128,7 +124,31 @@ class EpisodeBottomSheetFragment : BottomSheetDialogFragment() {
             ).show(parentFragmentManager, "errordialog")
         }
 
-        viewModel.loadEpisode(args.episodeId)
+        if(args.episodeId != null){
+            val episodeId: UUID = args.episodeId!!
+            binding.checkButton.setOnClickListener {
+                when (viewModel.played.value) {
+                    true -> viewModel.markAsUnplayed(episodeId)
+                    false -> viewModel.markAsPlayed(episodeId)
+                }
+            }
+
+            binding.favoriteButton.setOnClickListener {
+                when (viewModel.favorite.value) {
+                    true -> viewModel.unmarkAsFavorite(episodeId)
+                    false -> viewModel.markAsFavorite(episodeId)
+                }
+            }
+
+            binding.downloadButton.setOnClickListener {
+                viewModel.loadDownloadRequestItem(episodeId)
+            }
+
+            viewModel.loadEpisode(episodeId)
+        }else {
+            val playerItem = args.playerItem!!
+            viewModel.loadEpisode(playerItem)
+        }
 
         return binding.root
     }

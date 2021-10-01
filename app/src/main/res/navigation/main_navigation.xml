@@ -147,7 +147,14 @@
         tools:layout="@layout/episode_bottom_sheet">
         <argument
             android:name="episodeId"
-            app:argType="java.util.UUID" />
+            app:argType="java.util.UUID"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="playerItem"
+            app:argType="dev.jdtech.jellyfin.models.PlayerItem"
+            app:nullable="true"
+            android:defaultValue="@null"/>
         <action
             android:id="@+id/action_episodeBottomSheetFragment_to_playerActivity"
             app:destination="@id/playerActivity" />
@@ -179,10 +186,10 @@
         android:label="@string/title_download"
         tools:layout="@layout/fragment_download">
         <action
-            android:id="@+id/action_favoriteFragment_to_episodeBottomSheetFragment"
+            android:id="@+id/action_downloadFragment_to_episodeBottomSheetFragment"
             app:destination="@id/episodeBottomSheetFragment" />
         <action
-            android:id="@+id/action_favoriteFragment_to_mediaInfoFragment"
+            android:id="@+id/action_downloadFragment_to_mediaInfoFragment"
             app:destination="@id/mediaInfoFragment" />
     </fragment>
     <fragment
