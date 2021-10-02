@@ -1,6 +1,7 @@
 package dev.jdtech.jellyfin.fragments
 
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -18,6 +19,7 @@ import dev.jdtech.jellyfin.R
 import dev.jdtech.jellyfin.databinding.EpisodeBottomSheetBinding
 import dev.jdtech.jellyfin.dialogs.ErrorDialogFragment
 import dev.jdtech.jellyfin.models.PlayerItem
+import dev.jdtech.jellyfin.utils.deleteDownloadedEpisode
 import dev.jdtech.jellyfin.utils.loadDownloadedEpisodes
 import dev.jdtech.jellyfin.utils.requestDownload
 import dev.jdtech.jellyfin.viewmodels.EpisodeBottomSheetViewModel
@@ -144,10 +146,22 @@ class EpisodeBottomSheetFragment : BottomSheetDialogFragment() {
                 viewModel.loadDownloadRequestItem(episodeId)
             }
 
+            binding.deleteButton.visibility = View.GONE
+
             viewModel.loadEpisode(episodeId)
         }else {
             val playerItem = args.playerItem!!
             viewModel.loadEpisode(playerItem)
+
+            binding.deleteButton.setOnClickListener {
+                viewModel.deleteEpisode()
+                dismiss()
+                findNavController().navigate(R.id.downloadFragment)
+            }
+
+            binding.checkButton.visibility = View.GONE
+            binding.favoriteButton.visibility = View.GONE
+            binding.downloadButton.visibility = View.GONE
         }
 
         return binding.root

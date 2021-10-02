@@ -14,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.jdtech.jellyfin.models.DownloadRequestItem
 import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.repository.JellyfinRepository
+import dev.jdtech.jellyfin.utils.deleteDownloadedEpisode
 import dev.jdtech.jellyfin.utils.requestDownload
 import kotlinx.coroutines.launch
 import org.jellyfin.sdk.model.api.BaseItemDto
@@ -53,6 +54,7 @@ constructor(
 
     private val _downloadEpisode = MutableLiveData<Boolean>()
     val downloadEpisode: LiveData<Boolean> = _downloadEpisode
+
 
     var playerItems: MutableList<PlayerItem> = mutableListOf()
 
@@ -171,7 +173,11 @@ constructor(
             downloadRequestItem = DownloadRequestItem(uri, itemId, title)
             _downloadEpisode.value = true
         }
+    }
 
+    fun deleteEpisode() {
+        Timber.d("Test")
+        deleteDownloadedEpisode(playerItems[0].mediaSourceUri)
     }
 
     private fun getDateString(item: BaseItemDto): String {

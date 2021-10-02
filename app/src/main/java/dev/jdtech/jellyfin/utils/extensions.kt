@@ -22,6 +22,7 @@ import dev.jdtech.jellyfin.repository.JellyfinRepository
 import org.jellyfin.sdk.model.api.BaseItemDto
 import timber.log.Timber
 import java.io.File
+import java.nio.file.Paths
 import java.util.*
 
 fun BaseItemDto.toView(): View {
@@ -101,4 +102,9 @@ suspend fun Context.loadDownloadedEpisodes(jellyfinRepository: JellyfinRepositor
         }
     }
     return items.toList()
+}
+
+fun deleteDownloadedEpisode(uri: String) {
+    val file = File(uri)
+    file.delete()
 }
