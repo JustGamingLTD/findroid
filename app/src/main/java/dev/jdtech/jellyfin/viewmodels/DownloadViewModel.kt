@@ -48,7 +48,7 @@ constructor(
         viewModelScope.launch {
             try {
                 //val items = listOf<BaseItemDto>()
-                val items = application.loadDownloadedEpisodes(jellyfinRepository)
+                val items = application.loadDownloadedEpisodes()
                 if (items.isEmpty()) {
                     _downloadSections.value = listOf()
                     _finishedLoading.value = true

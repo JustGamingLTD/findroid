@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.Player
 import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.jdtech.jellyfin.models.DownloadMetadata
 import dev.jdtech.jellyfin.models.DownloadRequestItem
 import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.repository.JellyfinRepository
@@ -169,14 +170,14 @@ constructor(
             loadEpisode(itemId)
             val episode = _item.value
             val uri = jellyfinRepository.getStreamUrl(itemId, episode?.mediaSources?.get(0)?.id!!)
-            val title = /*"${episode.seriesName} S${episode.parentIndexNumber}E${episode.indexNumber} ID*/"${episode.id}"
-            downloadRequestItem = DownloadRequestItem(uri, itemId, title)
+            val title = episode.seriesName!!
+            val metadata = DownloadMetadata(episode.seriesName, episode.name, episode.parentIndexNumber, episode.indexNumber) //TODO CONVERT THIS INTO A PROPER FUNCTION WHICH READS A BASEITEMDTO
+            downloadRequestItem = DownloadRequestItem(uri, itemId, title, metadata)
             _downloadEpisode.value = true
         }
     }
 
     fun deleteEpisode() {
-        Timber.d("Test")
         deleteDownloadedEpisode(playerItems[0].mediaSourceUri)
     }
 

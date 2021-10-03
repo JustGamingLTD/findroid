@@ -22,14 +22,14 @@ class DownloadEpisodeListAdapter(private val onClickListener: OnClickListener) :
                     (episode.userData?.playedPercentage?.times(2.24))!!.toFloat(), binding.progressBar.context.resources.displayMetrics).toInt()
                 binding.progressBar.visibility = View.VISIBLE
             }*/
-            /*
+            /* //TODO MAKE THIS WORK WITH MOVIES
             if (episode.type == "Movie") {
                 binding.primaryName.text = episode.name
                 binding.secondaryName.visibility = View.GONE
             } else if (episode.type == "Episode") {
                 binding.primaryName.text = episode.seriesName
             }*/
-            binding.primaryName.text = episode.name
+            binding.primaryName.text = episode.metadata!!.seriesName
             binding.executePendingBindings()
         }
     }

@@ -42,18 +42,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/episode_image"
             tools:text="Wonder Egg Priority" />
-        <!--
+
         <TextView
             android:id="@+id/secondary_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:text="@{String.format(@string/episode_name_extended, episode.parentIndexNumber, episode.indexNumber, episode.name)}"
+            android:text="@{String.format(@string/episode_name_extended, episode.metadata.parentIndexNumber, episode.metadata.indexNumber, episode.metadata.name)}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/primary_name"
-            tools:text="The Girl Flautist" /> -->
+            tools:text="The Girl Flautist" />
 
         <FrameLayout
             android:id="@+id/progress_bar"
