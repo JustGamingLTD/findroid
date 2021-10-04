@@ -93,10 +93,11 @@ constructor(
 
         viewModelScope.launch {
             val mediaItems: MutableList<MediaItem> = mutableListOf()
-
+            var playFromDownloads = false
             try {
                 for (item in items) {
-                    val streamUrl = if(item.mediaSourceUri.isEmpty()){
+                    playFromDownloads = item.mediaSourceUri.isNotEmpty()
+                    val streamUrl = if(!playFromDownloads){
                         jellyfinRepository.getStreamUrl(item.itemId, item.mediaSourceId)
                     }else{
                         item.mediaSourceUri
@@ -115,7 +116,9 @@ constructor(
             }
 
             player.setMediaItems(mediaItems, currentWindow, items[0].playbackPosition)
-            player.prepare()
+            val useMpv = sp.getBoolean("mpv_player", false)
+            if(!useMpv || !playFromDownloads)
+                player.prepare() //TODO FOR SOME UNKNOWN REASON, THIS LINE CAUSES THE APP TO CRASH WHEN USING MPV AND PLAYING FROM DOWNLOADS
             player.play()
         }
 
