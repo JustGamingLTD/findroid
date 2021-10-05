@@ -1,16 +1,12 @@
 package dev.jdtech.jellyfin.adapters
 
-import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dev.jdtech.jellyfin.databinding.DownloadEpisodeItemBinding
-import dev.jdtech.jellyfin.databinding.HomeEpisodeItemBinding
 import dev.jdtech.jellyfin.models.PlayerItem
-import org.jellyfin.sdk.model.api.BaseItemDto
 
 class DownloadEpisodeListAdapter(private val onClickListener: OnClickListener) : ListAdapter<PlayerItem, DownloadEpisodeListAdapter.EpisodeViewHolder>(DiffCallback) {
     class EpisodeViewHolder(private var binding: DownloadEpisodeItemBinding) :

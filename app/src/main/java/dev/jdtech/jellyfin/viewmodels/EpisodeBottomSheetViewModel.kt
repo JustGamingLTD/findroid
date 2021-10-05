@@ -1,22 +1,16 @@
 package dev.jdtech.jellyfin.viewmodels
 
-import android.app.Application
-import android.net.Uri
 import android.os.Build
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.exoplayer2.Player
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.jdtech.jellyfin.models.DownloadMetadata
 import dev.jdtech.jellyfin.models.DownloadRequestItem
 import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.repository.JellyfinRepository
 import dev.jdtech.jellyfin.utils.deleteDownloadedEpisode
-import dev.jdtech.jellyfin.utils.requestDownload
 import kotlinx.coroutines.launch
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.ItemFields
@@ -171,7 +165,7 @@ constructor(
             val episode = _item.value
             val uri = jellyfinRepository.getStreamUrl(itemId, episode?.mediaSources?.get(0)?.id!!)
             val title = episode.seriesName!!
-            val metadata = DownloadMetadata(episode.seriesName, episode.name, episode.parentIndexNumber, episode.indexNumber) //TODO CONVERT THIS INTO A PROPER FUNCTION WHICH READS A BASEITEMDTO
+            val metadata = DownloadMetadata(episode.seriesName, episode.name, episode.parentIndexNumber, episode.indexNumber,episode.userData?.playbackPositionTicks?.div(10000) ?: 0) //TODO CONVERT THIS INTO A PROPER FUNCTION WHICH READS A BASEITEMDTO
             downloadRequestItem = DownloadRequestItem(uri, itemId, title, metadata)
             _downloadEpisode.value = true
         }

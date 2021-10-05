@@ -2,7 +2,6 @@ package dev.jdtech.jellyfin.viewmodels
 
 import android.annotation.SuppressLint
 import android.app.Application
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,15 +10,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.jdtech.jellyfin.models.DownloadSection
 import dev.jdtech.jellyfin.repository.JellyfinRepository
 import dev.jdtech.jellyfin.utils.loadDownloadedEpisodes
-import dev.jdtech.jellyfin.utils.toast
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.jellyfin.sdk.model.api.BaseItemDto
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
-import kotlinx.coroutines.*
 
 @HiltViewModel
 class DownloadViewModel

@@ -65,7 +65,7 @@ constructor(private val jellyfinRepository: JellyfinRepository) : ViewModel() {
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
-    var playerItems: MutableList<PlayerItem> = mutableListOf()
+    private var playerItems: MutableList<PlayerItem> = mutableListOf()
 
     private val _playerItemsError = MutableLiveData<String>()
     val playerItemsError: LiveData<String> = _playerItemsError

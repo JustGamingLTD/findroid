@@ -2,7 +2,6 @@ package dev.jdtech.jellyfin.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import org.jellyfin.sdk.model.api.BaseItemDto
 import java.util.*
 
 @Parcelize

@@ -15,6 +15,7 @@ import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.mpv.MPVPlayer
 import dev.jdtech.jellyfin.mpv.TrackType
 import dev.jdtech.jellyfin.repository.JellyfinRepository
+import dev.jdtech.jellyfin.utils.postDownloadPlaybackProgress
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -46,6 +47,7 @@ constructor(
 
     val trackSelector = DefaultTrackSelector(application)
     var playWhenReady = true
+    private var playFromDownloads = false
     private var currentWindow = 0
     private var playbackPosition: Long = 0
 
@@ -53,7 +55,6 @@ constructor(
 
     init {
         val useMpv = sp.getBoolean("mpv_player", false)
-
         val preferredAudioLanguage = sp.getString("audio_language", null) ?: ""
         val preferredSubtitleLanguage = sp.getString("subtitle_language", null) ?: ""
 
@@ -93,7 +94,6 @@ constructor(
 
         viewModelScope.launch {
             val mediaItems: MutableList<MediaItem> = mutableListOf()
-            var playFromDownloads = false
             try {
                 for (item in items) {
                     playFromDownloads = item.mediaSourceUri.isNotEmpty()
@@ -152,14 +152,17 @@ constructor(
             override fun run() {
                 viewModelScope.launch {
                     if (player.currentMediaItem != null) {
-                        try {
-                            jellyfinRepository.postPlaybackProgress(
-                                UUID.fromString(player.currentMediaItem!!.mediaId),
-                                player.currentPosition.times(10000),
-                                !player.isPlaying
-                            )
-                        } catch (e: Exception) {
-                            Timber.e(e)
+                            try {
+                                jellyfinRepository.postPlaybackProgress(
+                                    UUID.fromString(player.currentMediaItem!!.mediaId),
+                                    player.currentPosition.times(10000),
+                                    !player.isPlaying
+                                )
+                            } catch (e: Exception) {
+                                Timber.e(e)
+                            }
+                        if(playFromDownloads){
+                            postDownloadPlaybackProgress(items[0].mediaSourceUri, player.currentPosition) //TODO AUTOMATICALLY USE THE CORRECT ITEM
                         }
                     }
                 }
