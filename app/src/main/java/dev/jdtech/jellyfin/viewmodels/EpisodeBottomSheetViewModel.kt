@@ -10,7 +10,9 @@ import dev.jdtech.jellyfin.models.DownloadMetadata
 import dev.jdtech.jellyfin.models.DownloadRequestItem
 import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.repository.JellyfinRepository
+import dev.jdtech.jellyfin.utils.baseItemDtoToDownloadMetadata
 import dev.jdtech.jellyfin.utils.deleteDownloadedEpisode
+import dev.jdtech.jellyfin.utils.downloadMetadataToBaseItemDto
 import kotlinx.coroutines.launch
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.ItemFields
@@ -74,12 +76,14 @@ constructor(
 
     fun loadEpisode(playerItem : PlayerItem){
         playerItems.add(playerItem)
+        val metadata = playerItem.metadata!!
+        _item.value = downloadMetadataToBaseItemDto(playerItem.metadata)
     }
 
     fun preparePlayerItems() {
         _playerItemsError.value = null
         viewModelScope.launch {
-            if(_item.value != null){
+            if(playerItems.isEmpty()){ //TODO REPLACE THIS WITH A GOOD WAY OF DETECTING WHETHER PLAYING FROM DOWNLOADS
                 try {
                     createPlayerItems(_item.value!!)
                     _navigateToPlayer.value = true
@@ -165,7 +169,7 @@ constructor(
             val episode = _item.value
             val uri = jellyfinRepository.getStreamUrl(itemId, episode?.mediaSources?.get(0)?.id!!)
             val title = episode.seriesName!!
-            val metadata = DownloadMetadata(episode.seriesName, episode.name, episode.parentIndexNumber, episode.indexNumber,episode.userData?.playbackPositionTicks?.div(10000) ?: 0) //TODO CONVERT THIS INTO A PROPER FUNCTION WHICH READS A BASEITEMDTO
+            val metadata = baseItemDtoToDownloadMetadata(episode)
             downloadRequestItem = DownloadRequestItem(uri, itemId, title, metadata)
             _downloadEpisode.value = true
         }

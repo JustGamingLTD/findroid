@@ -15,6 +15,8 @@ import dev.jdtech.jellyfin.R
 import dev.jdtech.jellyfin.models.DownloadMetadata
 import dev.jdtech.jellyfin.models.DownloadRequestItem
 import dev.jdtech.jellyfin.models.PlayerItem
+import org.jellyfin.sdk.model.api.BaseItemDto
+import org.jellyfin.sdk.model.api.UserItemDataDto
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -48,7 +50,7 @@ fun Fragment.requestDownload(uri: Uri, downloadRequestItem: DownloadRequestItem)
     val defaultStorage = requireContext().getDownloadLocation()
     Timber.d(defaultStorage.toString())
     val downloadRequest = DownloadManager.Request(uri)
-        .setTitle(downloadRequestItem.itemId.toString())
+        .setTitle(downloadRequestItem.metadata.name)
         .setDescription("Downloading")
         .setDestinationUri(Uri.fromFile(File(defaultStorage, downloadRequestItem.itemId.toString())))
         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -70,6 +72,7 @@ private fun Context.createMetadataFile(metadata: DownloadMetadata, itemId: UUID)
         out.println(metadata.parentIndexNumber.toString())
         out.println(metadata.indexNumber.toString())
         out.println(metadata.playbackPosition.toString())
+        out.println(metadata.playedPercentage.toString())
     }
 }
 
@@ -92,7 +95,13 @@ fun Context.loadDownloadedEpisodes(): List<PlayerItem> {
     defaultStorage?.walk()?.forEach {
         if (it.isFile && it.extension == "") {
             val metadataFile = File(defaultStorage, "${it.name}.metadata").readLines()
-            val metadata = DownloadMetadata(metadataFile[0], metadataFile[1], metadataFile[2].toInt(), metadataFile[3].toInt(), metadataFile[4].toLong()) //TODO CONVERT THIS INTO A PROPER FUNCTION
+            val metadata = DownloadMetadata(UUID.fromString(it.name),
+                metadataFile[0],
+                metadataFile[1],
+                metadataFile[2].toInt(),
+                metadataFile[3].toInt(),
+                metadataFile[4].toLong(),
+                if(metadataFile[5] == "null") {null} else {metadataFile[5].toDouble()}) //TODO CONVERT THIS INTO A PROPER FUNCTION
             items.add(PlayerItem(metadata.name, UUID.fromString(it.name), "", metadataFile[4].toLong(), it.absolutePath, metadata))
         }
     }
@@ -109,21 +118,37 @@ fun deleteDownloadedEpisode(uri: String) {
 
 }
 
-fun postDownloadPlaybackProgress(uri: String, playbackPosition: Long) {
+fun postDownloadPlaybackProgress(uri: String, playbackPosition: Long, playedPercentage: Double) {
     try {
         Timber.d(uri)
         val metadataFile = File("${uri}.metadata")
         val metadataArray = metadataFile.readLines().toMutableList()
         metadataArray[4] = playbackPosition.toString()
-
+        metadataArray[5] = playedPercentage.times(100).toString()
         metadataFile.writeText("") //This might be necessary to make sure that the metadata file is empty
         metadataFile.printWriter().use { out ->
-            metadataArray.forEach(){
+            metadataArray.forEach {
                 out.println(it)
             }
         }
-        Timber.d("Wrinting stkajsdflk--------------------------------------------------")
     } catch (e: Exception) {
         Timber.e(e)
     }
+}
+
+fun downloadMetadataToBaseItemDto(metadata: DownloadMetadata) : BaseItemDto {
+    val userData = UserItemDataDto(playbackPositionTicks = metadata.playbackPosition ?: 0,
+        playedPercentage = metadata.playedPercentage, isFavorite = false, playCount = 0, played = false) //TODO DO SOMETHING ABOUT THE HARDCODED VALUES
+
+    return BaseItemDto(id=metadata.id,
+        seriesName = metadata.seriesName,
+        name = metadata.name,
+        parentIndexNumber = metadata.parentIndexNumber,
+        indexNumber = metadata.indexNumber,
+        userData = userData
+    )
+}
+
+fun baseItemDtoToDownloadMetadata(item: BaseItemDto) : DownloadMetadata {
+    return DownloadMetadata(item.id, item.seriesName, item.name, item.parentIndexNumber, item.indexNumber,item.userData?.playbackPositionTicks ?: 0, item.userData?.playedPercentage)
 }

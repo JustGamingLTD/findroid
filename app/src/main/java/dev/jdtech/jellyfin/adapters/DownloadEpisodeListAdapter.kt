@@ -1,23 +1,27 @@
 package dev.jdtech.jellyfin.adapters
 
+import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dev.jdtech.jellyfin.databinding.DownloadEpisodeItemBinding
 import dev.jdtech.jellyfin.models.PlayerItem
+import dev.jdtech.jellyfin.utils.downloadMetadataToBaseItemDto
 
 class DownloadEpisodeListAdapter(private val onClickListener: OnClickListener) : ListAdapter<PlayerItem, DownloadEpisodeListAdapter.EpisodeViewHolder>(DiffCallback) {
     class EpisodeViewHolder(private var binding: DownloadEpisodeItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(episode: PlayerItem) {
-            binding.episode = episode
-            /*if (episode.userData?.playedPercentage != null) {
+            val metadata = episode.metadata!!
+            binding.episode = downloadMetadataToBaseItemDto(episode.metadata)
+            if (metadata.playedPercentage != null) {
                 binding.progressBar.layoutParams.width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    (episode.userData?.playedPercentage?.times(2.24))!!.toFloat(), binding.progressBar.context.resources.displayMetrics).toInt()
+                    (metadata.playedPercentage.times(2.24)).toFloat(), binding.progressBar.context.resources.displayMetrics).toInt()
                 binding.progressBar.visibility = View.VISIBLE
-            }*/
+            }
             /* //TODO MAKE THIS WORK WITH MOVIES
             if (episode.type == "Movie") {
                 binding.primaryName.text = episode.name
@@ -25,7 +29,7 @@ class DownloadEpisodeListAdapter(private val onClickListener: OnClickListener) :
             } else if (episode.type == "Episode") {
                 binding.primaryName.text = episode.seriesName
             }*/
-            binding.primaryName.text = episode.metadata!!.seriesName
+            binding.primaryName.text = metadata.seriesName
             binding.executePendingBindings()
         }
     }

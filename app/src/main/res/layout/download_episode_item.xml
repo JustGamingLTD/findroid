@@ -7,7 +7,7 @@
 
         <variable
             name="episode"
-            type="dev.jdtech.jellyfin.models.PlayerItem" />
+            type="org.jellyfin.sdk.model.api.BaseItemDto" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,14 +22,12 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_download"
+            app:baseItemImage="@{episode}"
             app:layout_constraintDimensionRatio="H,16:9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/roundedImageView"/>
-            <!--app:baseItemImage="@{episode}" TODO MAKE IT SO THAT THE STORED EPISODE CAN HAVE AN IMAGE ASSOCIATED WITH IT-->
-
+            app:shapeAppearanceOverlay="@style/roundedImageView" />
 
         <TextView
             android:id="@+id/primary_name"
@@ -48,7 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:text="@{String.format(@string/episode_name_extended, episode.metadata.parentIndexNumber, episode.metadata.indexNumber, episode.metadata.name)}"
+            android:text="@{String.format(@string/episode_name_extended, episode.parentIndexNumber, episode.indexNumber, episode.name)}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
