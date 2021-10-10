@@ -57,7 +57,6 @@ fun Fragment.requestDownload(uri: Uri, downloadRequestItem: DownloadRequestItem)
 
     requireContext().downloadFile(downloadRequest, 1)
     requireContext().createMetadataFile(downloadRequestItem.metadata, downloadRequestItem.itemId)
-
 }
 
 private fun Context.createMetadataFile(metadata: DownloadMetadata, itemId: UUID) {
@@ -66,14 +65,28 @@ private fun Context.createMetadataFile(metadata: DownloadMetadata, itemId: UUID)
 
     metadataFile.writeText("") //This might be necessary to make sure that the metadata file is empty
 
-    metadataFile.printWriter().use { out ->
-        out.println(metadata.seriesName.toString())
-        out.println(metadata.name.toString())
-        out.println(metadata.parentIndexNumber.toString())
-        out.println(metadata.indexNumber.toString())
-        out.println(metadata.playbackPosition.toString())
-        out.println(metadata.playedPercentage.toString())
+    if(metadata.type == "Episode") {
+        metadataFile.printWriter().use { out ->
+            out.println(metadata.id)
+            out.println(metadata.type.toString())
+            out.println(metadata.seriesName.toString())
+            out.println(metadata.name.toString())
+            out.println(metadata.parentIndexNumber.toString())
+            out.println(metadata.indexNumber.toString())
+            out.println(metadata.playbackPosition.toString())
+            out.println(metadata.playedPercentage.toString())
+            out.println(metadata.seriesId.toString())
+        }
+    } else if (metadata.type == "Movie") {
+        metadataFile.printWriter().use { out ->
+            out.println(metadata.id)
+            out.println(metadata.type.toString())
+            out.println(metadata.name.toString())
+            out.println(metadata.playbackPosition.toString())
+            out.println(metadata.playedPercentage.toString())
+        }
     }
+
 }
 
 private fun Context.downloadFile(request: DownloadManager.Request, downloadMethod: Int) {
@@ -95,14 +108,8 @@ fun Context.loadDownloadedEpisodes(): List<PlayerItem> {
     defaultStorage?.walk()?.forEach {
         if (it.isFile && it.extension == "") {
             val metadataFile = File(defaultStorage, "${it.name}.metadata").readLines()
-            val metadata = DownloadMetadata(UUID.fromString(it.name),
-                metadataFile[0],
-                metadataFile[1],
-                metadataFile[2].toInt(),
-                metadataFile[3].toInt(),
-                metadataFile[4].toLong(),
-                if(metadataFile[5] == "null") {null} else {metadataFile[5].toDouble()}) //TODO CONVERT THIS INTO A PROPER FUNCTION
-            items.add(PlayerItem(metadata.name, UUID.fromString(it.name), "", metadataFile[4].toLong(), it.absolutePath, metadata))
+            val metadata = parseMetadataFile(metadataFile)
+            items.add(PlayerItem(metadata.name, UUID.fromString(it.name), "", metadata.playbackPosition!!, it.absolutePath, metadata))
         }
     }
     return items.toList()
@@ -120,11 +127,10 @@ fun deleteDownloadedEpisode(uri: String) {
 
 fun postDownloadPlaybackProgress(uri: String, playbackPosition: Long, playedPercentage: Double) {
     try {
-        Timber.d(uri)
         val metadataFile = File("${uri}.metadata")
         val metadataArray = metadataFile.readLines().toMutableList()
-        metadataArray[4] = playbackPosition.toString()
-        metadataArray[5] = playedPercentage.times(100).toString()
+        metadataArray[6] = playbackPosition.toString()
+        metadataArray[7] = playedPercentage.times(100).toString()
         metadataFile.writeText("") //This might be necessary to make sure that the metadata file is empty
         metadataFile.printWriter().use { out ->
             metadataArray.forEach {
@@ -140,15 +146,49 @@ fun downloadMetadataToBaseItemDto(metadata: DownloadMetadata) : BaseItemDto {
     val userData = UserItemDataDto(playbackPositionTicks = metadata.playbackPosition ?: 0,
         playedPercentage = metadata.playedPercentage, isFavorite = false, playCount = 0, played = false) //TODO DO SOMETHING ABOUT THE HARDCODED VALUES
 
-    return BaseItemDto(id=metadata.id,
+    return BaseItemDto(id = metadata.id,
+        type = metadata.type,
         seriesName = metadata.seriesName,
         name = metadata.name,
         parentIndexNumber = metadata.parentIndexNumber,
         indexNumber = metadata.indexNumber,
-        userData = userData
+        userData = userData,
+        seriesId = metadata.seriesId
     )
 }
 
 fun baseItemDtoToDownloadMetadata(item: BaseItemDto) : DownloadMetadata {
-    return DownloadMetadata(item.id, item.seriesName, item.name, item.parentIndexNumber, item.indexNumber,item.userData?.playbackPositionTicks ?: 0, item.userData?.playedPercentage)
+    return DownloadMetadata(id = item.id,
+        type = item.type,
+        seriesName = item.seriesName,
+        name = item.name,
+        parentIndexNumber = item.parentIndexNumber,
+        indexNumber = item.indexNumber,
+        playbackPosition = item.userData?.playbackPositionTicks ?: 0,
+        playedPercentage = item.userData?.playedPercentage,
+        seriesId = item.seriesId
+    )
+}
+
+fun parseMetadataFile(metadataFile: List<String>) : DownloadMetadata {
+    if (metadataFile[1] == "Episode") {
+        return DownloadMetadata(id = UUID.fromString(metadataFile[0]),
+            type = metadataFile[1],
+            seriesName = metadataFile[2],
+            name = metadataFile[3],
+            parentIndexNumber = metadataFile[4].toInt(),
+            indexNumber = metadataFile[5].toInt(),
+            playbackPosition = metadataFile[6].toLong(),
+            playedPercentage = if(metadataFile[7] == "null") {null} else {metadataFile[7].toDouble()},
+            seriesId = UUID.fromString(metadataFile[8])
+        )
+    } else {
+        return DownloadMetadata(id = UUID.fromString(metadataFile[0]),
+            type = metadataFile[1],
+            name = metadataFile[2],
+            playbackPosition = metadataFile[3].toLong(),
+            playedPercentage = if(metadataFile[4] == "null") {null} else {metadataFile[4].toDouble()},
+        ) //TODO CHANGE THIS TO PARSE THE FILE IF IT IS A MOVIE
+    }
+
 }

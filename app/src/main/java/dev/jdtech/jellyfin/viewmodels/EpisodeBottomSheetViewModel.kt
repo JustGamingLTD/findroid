@@ -52,7 +52,6 @@ constructor(
     private val _downloadEpisode = MutableLiveData<Boolean>()
     val downloadEpisode: LiveData<Boolean> = _downloadEpisode
 
-
     var playerItems: MutableList<PlayerItem> = mutableListOf()
 
     lateinit var downloadRequestItem: DownloadRequestItem
@@ -168,9 +167,8 @@ constructor(
             loadEpisode(itemId)
             val episode = _item.value
             val uri = jellyfinRepository.getStreamUrl(itemId, episode?.mediaSources?.get(0)?.id!!)
-            val title = episode.seriesName!!
             val metadata = baseItemDtoToDownloadMetadata(episode)
-            downloadRequestItem = DownloadRequestItem(uri, itemId, title, metadata)
+            downloadRequestItem = DownloadRequestItem(uri, itemId, metadata)
             _downloadEpisode.value = true
         }
     }

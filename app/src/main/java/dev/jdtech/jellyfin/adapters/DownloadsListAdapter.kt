@@ -21,9 +21,9 @@ class DownloadsListAdapter(
         ) {
             binding.section = section
             if (section.name == "Movies" || section.name == "Shows") {
-                //binding.itemsRecyclerView.adapter = //TODO FIX AND UNCOMMENT THIS SO THAT IT CAN WORK WITH MOVIE DOWNLOADS
-                //    ViewItemListAdapter(onClickListener, fixedWidth = true)
-                //(binding.itemsRecyclerView.adapter as ViewItemListAdapter).submitList(section.items)
+                binding.itemsRecyclerView.adapter = //TODO FIX AND UNCOMMENT THIS SO THAT IT CAN WORK WITH MOVIE DOWNLOADS
+                    DownloadEpisodeListAdapter(onEpisodeClickListener)
+                (binding.itemsRecyclerView.adapter as DownloadEpisodeListAdapter).submitList(section.items)
             } else if (section.name == "Episodes") {
                 binding.itemsRecyclerView.adapter =
                     DownloadEpisodeListAdapter(onEpisodeClickListener)

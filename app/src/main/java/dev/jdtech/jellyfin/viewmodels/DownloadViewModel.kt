@@ -37,60 +37,37 @@ constructor(
     }
 
     @SuppressLint("ResourceType")
-    fun loadData() {
+    fun loadData() { //TODO MAKE THIS FUNCTION SYNC THE PLAYBACK PROGRESS OF THE DOWNLOADS WITH THE SERVER BY KEEPING WHICHEVER IS HIGHEST
         _error.value = null
         _finishedLoading.value = false
         viewModelScope.launch {
             try {
-                //val items = listOf<BaseItemDto>()
                 val items = application.loadDownloadedEpisodes()
                 if (items.isEmpty()) {
                     _downloadSections.value = listOf()
                     _finishedLoading.value = true
                     return@launch
                 }
-
+                Timber.d(items[0].metadata?.type)
                 val tempDownloadSections = mutableListOf<DownloadSection>()
                     withContext(Dispatchers.Default) {
                         DownloadSection(
                             UUID.randomUUID(),
                             "Episodes",
-                            items).let {
+                            items.filter { it.metadata?.type == "Episode"}).let {
                             if (it.items.isNotEmpty()) tempDownloadSections.add(
                                 it
                             )
                         }
-                        /*
                     DownloadSection(
-                        UUID.randomUUID(),
-                        "Movies",
-                        items.filter { it.type == "Movie" }).let {
-                        if (it.items.isNotEmpty()) tempDownloadSections.add(
-                            it
-                        )
+                            UUID.randomUUID(),
+                            "Movies",
+                            items.filter { it.metadata?.type == "Movie" }).let {
+                            if (it.items.isNotEmpty()) tempDownloadSections.add(
+                                it
+                            )
+                        }
                     }
-                    DownloadSection(
-                        UUID.randomUUID(),
-                        "Shows",
-                        items.filter { it.type == "Series" }).let {
-                        if (it.items.isNotEmpty()) tempDownloadSections.add(
-                            it
-                        )
-                    }
-                    DownloadSection(
-                        UUID.randomUUID(),
-                        "Episodes",
-                        items.filter { it.type == "Episode" }).let {
-                        if (it.items.isNotEmpty()) tempDownloadSections.add(
-                            it
-                        )
-                    }
-
-                         */
-
-
-                }
-
                 _downloadSections.value = tempDownloadSections
             } catch (e: Exception) {
                 Timber.e(e)

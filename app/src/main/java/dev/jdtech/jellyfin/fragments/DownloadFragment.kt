@@ -37,7 +37,7 @@ class DownloadFragment : Fragment() {
             ViewItemListAdapter.OnClickListener { item ->
                 //navigateToMediaInfoFragment(item) //TODO MAKE THIS FUNCTION WORK WITH PALYERITEM
             }, DownloadEpisodeListAdapter.OnClickListener { item ->
-                navigateToEpisodeBottomSheetFragment(item) //TODO MAKE THIS FUNCTION WORK WITH PLAYERITEM
+                navigateToEpisodeBottomSheetFragment(item)
             })
 
         viewModel.finishedLoading.observe(viewLifecycleOwner, { isFinished ->
@@ -70,8 +70,6 @@ class DownloadFragment : Fragment() {
                 binding.noDownloadsText.visibility = View.GONE
             }
         })
-
-        //loadDownloadedEpisodes()
 
         return binding.root
     }

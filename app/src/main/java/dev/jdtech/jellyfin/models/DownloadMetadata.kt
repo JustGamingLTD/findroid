@@ -7,10 +7,12 @@ import java.util.*
 @Parcelize
 data class DownloadMetadata(
     val id: UUID,
-    val seriesName: String?,
-    val name: String?,
-    val parentIndexNumber: Int?,
-    val indexNumber: Int?,
-    val playbackPosition: Long?,
-    val playedPercentage: Double?
+    val type: String?,
+    val seriesName: String? = null,
+    val name: String? = null,
+    val parentIndexNumber: Int? = null,
+    val indexNumber: Int? = null,
+    val playbackPosition: Long? = null,
+    val playedPercentage: Double? = null,
+    val seriesId: UUID? = null
 ) : Parcelable

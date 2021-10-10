@@ -6,8 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.jdtech.jellyfin.models.DownloadRequestItem
 import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.repository.JellyfinRepository
+import dev.jdtech.jellyfin.utils.baseItemDtoToDownloadMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,6 +68,11 @@ constructor(private val jellyfinRepository: JellyfinRepository) : ViewModel() {
     val error: LiveData<String> = _error
 
     private var playerItems: MutableList<PlayerItem> = mutableListOf()
+
+    private val _downloadMedia = MutableLiveData<Boolean>()
+    val downloadMedia: LiveData<Boolean> = _downloadMedia
+
+    lateinit var downloadRequestItem: DownloadRequestItem
 
     private val _playerItemsError = MutableLiveData<String>()
     val playerItemsError: LiveData<String> = _playerItemsError
@@ -267,7 +274,21 @@ constructor(private val jellyfinRepository: JellyfinRepository) : ViewModel() {
         if (playerItems.isEmpty() || playerItems.count() == introsCount) throw Exception("No playable items found")
     }
 
+    fun loadDownloadRequestItem(itemId: UUID) {
+        viewModelScope.launch {
+            val downloadItem = _item.value
+            val uri = jellyfinRepository.getStreamUrl(itemId, downloadItem?.mediaSources?.get(0)?.id!!)
+            val metadata = baseItemDtoToDownloadMetadata(downloadItem)
+            downloadRequestItem = DownloadRequestItem(uri, itemId, metadata)
+            _downloadMedia.value = true
+        }
+    }
+
     fun doneNavigatingToPlayer() {
         _navigateToPlayer.value = null
+    }
+
+    fun doneDownloadMedia() {
+        _downloadMedia.value = false
     }
 }

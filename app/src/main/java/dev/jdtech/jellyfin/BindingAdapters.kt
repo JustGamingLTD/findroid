@@ -122,7 +122,7 @@ fun bindBaseItemImage(imageView: ImageView, episode: BaseItemDto?) {
     var imageItemId = episode.id
     var imageType = ImageType.PRIMARY
 
-    if (!episode.imageTags.isNullOrEmpty()) {
+    if (!episode.imageTags.isNullOrEmpty()) { //TODO DOWNLOADMETADATA DOES NOT CURRENTLY STORE IMAGETAGS, SO FOR DOWNLOADS IT ALWAYS USES THE SERIES BACKDROP
         when (episode.type) {
             "Movie" -> {
                 if (!episode.backdropImageTags.isNullOrEmpty()) {

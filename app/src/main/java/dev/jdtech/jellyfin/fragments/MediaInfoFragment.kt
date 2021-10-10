@@ -20,6 +20,7 @@ import dev.jdtech.jellyfin.dialogs.ErrorDialogFragment
 import dev.jdtech.jellyfin.dialogs.VideoVersionDialogFragment
 import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.utils.checkIfLoginRequired
+import dev.jdtech.jellyfin.utils.requestDownload
 import dev.jdtech.jellyfin.viewmodels.MediaInfoViewModel
 import org.jellyfin.sdk.model.api.BaseItemDto
 
@@ -55,6 +56,17 @@ class MediaInfoFragment : Fragment() {
             } else {
                 binding.errorLayout.errorPanel.visibility = View.GONE
                 binding.mediaInfoScrollview.visibility = View.VISIBLE
+            }
+        })
+
+        if(args.itemType != "Movie") {
+            binding.downloadButton.visibility = View.GONE
+        }
+
+        viewModel.downloadMedia.observe(viewLifecycleOwner, {
+            if (it) {
+                requestDownload(Uri.parse(viewModel.downloadRequestItem.uri), viewModel.downloadRequestItem)
+                viewModel.doneDownloadMedia()
             }
         })
 
@@ -196,6 +208,10 @@ class MediaInfoFragment : Fragment() {
                 true -> viewModel.unmarkAsFavorite(args.itemId)
                 false -> viewModel.markAsFavorite(args.itemId)
             }
+        }
+
+        binding.downloadButton.setOnClickListener {
+            viewModel.loadDownloadRequestItem(args.itemId)
         }
 
         viewModel.loadData(args.itemId, args.itemType)

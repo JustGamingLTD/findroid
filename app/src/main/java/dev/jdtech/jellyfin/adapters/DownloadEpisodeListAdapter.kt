@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import dev.jdtech.jellyfin.databinding.DownloadEpisodeItemBinding
+import dev.jdtech.jellyfin.databinding.HomeEpisodeItemBinding
 import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.utils.downloadMetadataToBaseItemDto
+import timber.log.Timber
 
 class DownloadEpisodeListAdapter(private val onClickListener: OnClickListener) : ListAdapter<PlayerItem, DownloadEpisodeListAdapter.EpisodeViewHolder>(DiffCallback) {
-    class EpisodeViewHolder(private var binding: DownloadEpisodeItemBinding) :
+    class EpisodeViewHolder(private var binding: HomeEpisodeItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(episode: PlayerItem) {
             val metadata = episode.metadata!!
@@ -22,14 +23,14 @@ class DownloadEpisodeListAdapter(private val onClickListener: OnClickListener) :
                     (metadata.playedPercentage.times(2.24)).toFloat(), binding.progressBar.context.resources.displayMetrics).toInt()
                 binding.progressBar.visibility = View.VISIBLE
             }
-            /* //TODO MAKE THIS WORK WITH MOVIES
-            if (episode.type == "Movie") {
-                binding.primaryName.text = episode.name
+             //TODO MAKE THIS WORK WITH MOVIES
+            if (metadata.type == "Movie") {
+                binding.primaryName.text = metadata.name
+                Timber.d(metadata.name)
                 binding.secondaryName.visibility = View.GONE
-            } else if (episode.type == "Episode") {
-                binding.primaryName.text = episode.seriesName
-            }*/
-            binding.primaryName.text = metadata.seriesName
+            } else if (metadata.type == "Episode") {
+                binding.primaryName.text = metadata.seriesName
+            }
             binding.executePendingBindings()
         }
     }
@@ -46,7 +47,7 @@ class DownloadEpisodeListAdapter(private val onClickListener: OnClickListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodeViewHolder {
         return EpisodeViewHolder(
-            DownloadEpisodeItemBinding.inflate(
+            HomeEpisodeItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
