@@ -10,6 +10,8 @@ import dev.jdtech.jellyfin.models.DownloadRequestItem
 import dev.jdtech.jellyfin.models.PlayerItem
 import dev.jdtech.jellyfin.repository.JellyfinRepository
 import dev.jdtech.jellyfin.utils.baseItemDtoToDownloadMetadata
+import dev.jdtech.jellyfin.utils.deleteDownloadedEpisode
+import dev.jdtech.jellyfin.utils.downloadMetadataToBaseItemDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -103,6 +105,12 @@ constructor(private val jellyfinRepository: JellyfinRepository) : ViewModel() {
         }
     }
 
+    fun loadData(playerItem: PlayerItem) {
+        playerItems.add(playerItem)
+        val metadata = playerItem.metadata!!
+        _item.value = downloadMetadataToBaseItemDto(metadata)
+    }
+
     private suspend fun getActors(item: BaseItemDto): List<BaseItemPerson>? {
         val actors: List<BaseItemPerson>?
         withContext(Dispatchers.Default) {
@@ -188,11 +196,16 @@ constructor(private val jellyfinRepository: JellyfinRepository) : ViewModel() {
     fun preparePlayerItems(mediaSourceIndex: Int? = null) {
         _playerItemsError.value = null
         viewModelScope.launch {
-            try {
-                createPlayerItems(_item.value!!, mediaSourceIndex)
+            if(playerItems.isEmpty()){ //TODO REPLACE THIS WITH A GOOD WAY OF DETECTING WHETHER PLAYING FROM DOWNLOADS
+                try {
+                    createPlayerItems(_item.value!!, mediaSourceIndex)
+                    _navigateToPlayer.value = playerItems.toTypedArray()
+                } catch (e: Exception) {
+                    _playerItemsError.value = e.message
+                }
+            } else {
+                Timber.d("NAVIGATRING TO PLAYER")
                 _navigateToPlayer.value = playerItems.toTypedArray()
-            } catch (e: Exception) {
-                _playerItemsError.value = e.message
             }
         }
     }
@@ -282,6 +295,10 @@ constructor(private val jellyfinRepository: JellyfinRepository) : ViewModel() {
             downloadRequestItem = DownloadRequestItem(uri, itemId, metadata)
             _downloadMedia.value = true
         }
+    }
+
+    fun deleteItem() {
+        deleteDownloadedEpisode(playerItems[0].mediaSourceUri)
     }
 
     fun doneNavigatingToPlayer() {

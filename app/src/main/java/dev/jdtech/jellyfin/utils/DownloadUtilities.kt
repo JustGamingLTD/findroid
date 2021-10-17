@@ -129,8 +129,14 @@ fun postDownloadPlaybackProgress(uri: String, playbackPosition: Long, playedPerc
     try {
         val metadataFile = File("${uri}.metadata")
         val metadataArray = metadataFile.readLines().toMutableList()
-        metadataArray[6] = playbackPosition.toString()
-        metadataArray[7] = playedPercentage.times(100).toString()
+        if(metadataArray[1] == "Episode"){
+            metadataArray[6] = playbackPosition.toString()
+            metadataArray[7] = playedPercentage.times(100).toString()
+        } else if (metadataArray[1] == "Movie") {
+            metadataArray[3] = playbackPosition.toString()
+            metadataArray[4] = playedPercentage.times(100).toString()
+        }
+
         metadataFile.writeText("") //This might be necessary to make sure that the metadata file is empty
         metadataFile.printWriter().use { out ->
             metadataArray.forEach {

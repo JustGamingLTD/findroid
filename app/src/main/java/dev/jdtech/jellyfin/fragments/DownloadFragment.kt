@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jdtech.jellyfin.R
 import dev.jdtech.jellyfin.adapters.DownloadEpisodeListAdapter
+import dev.jdtech.jellyfin.adapters.DownloadViewItemListAdapter
 import dev.jdtech.jellyfin.adapters.DownloadsListAdapter
 import dev.jdtech.jellyfin.adapters.ViewItemListAdapter
 import dev.jdtech.jellyfin.databinding.FragmentDownloadBinding
@@ -34,8 +35,8 @@ class DownloadFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         binding.downloadsRecyclerView.adapter = DownloadsListAdapter(
-            ViewItemListAdapter.OnClickListener { item ->
-                //navigateToMediaInfoFragment(item) //TODO MAKE THIS FUNCTION WORK WITH PALYERITEM
+            DownloadViewItemListAdapter.OnClickListener { item ->
+                navigateToMediaInfoFragment(item) //TODO MAKE THIS FUNCTION WORK WITH PALYERITEM
             }, DownloadEpisodeListAdapter.OnClickListener { item ->
                 navigateToEpisodeBottomSheetFragment(item)
             })
@@ -74,12 +75,13 @@ class DownloadFragment : Fragment() {
         return binding.root
     }
 
-    private fun navigateToMediaInfoFragment(item: BaseItemDto) {
+    private fun navigateToMediaInfoFragment(item: PlayerItem) {
         findNavController().navigate(
-            FavoriteFragmentDirections.actionFavoriteFragmentToMediaInfoFragment(
-                item.id,
+            DownloadFragmentDirections.actionDownloadFragmentToMediaInfoFragment(
+                null,
                 item.name,
-                item.type ?: "Unknown"
+                item.metadata?.type ?: "Unknown",
+                item
             )
         )
     }

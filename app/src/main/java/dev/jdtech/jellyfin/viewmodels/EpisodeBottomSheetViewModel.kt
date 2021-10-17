@@ -89,7 +89,7 @@ constructor(
                 } catch (e: Exception) {
                     _playerItemsError.value = e.toString()
                 }
-            }else if (playerItems.isNotEmpty()){
+            }else {
                 _navigateToPlayer.value = true
             }
 

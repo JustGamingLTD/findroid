@@ -9,24 +9,24 @@ import dev.jdtech.jellyfin.databinding.DownloadSectionBinding
 import dev.jdtech.jellyfin.models.DownloadSection
 
 class DownloadsListAdapter(
-    private val onClickListener: ViewItemListAdapter.OnClickListener,
+    private val onClickListener: DownloadViewItemListAdapter.OnClickListener,
     private val onEpisodeClickListener: DownloadEpisodeListAdapter.OnClickListener
 ) : ListAdapter<DownloadSection, DownloadsListAdapter.SectionViewHolder>(DiffCallback) {
     class SectionViewHolder(private var binding: DownloadSectionBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(
             section: DownloadSection,
-            onClickListener: ViewItemListAdapter.OnClickListener,
+            onClickListener: DownloadViewItemListAdapter.OnClickListener,
             onEpisodeClickListener: DownloadEpisodeListAdapter.OnClickListener
         ) {
             binding.section = section
             if (section.name == "Movies" || section.name == "Shows") {
-                binding.itemsRecyclerView.adapter = //TODO FIX AND UNCOMMENT THIS SO THAT IT CAN WORK WITH MOVIE DOWNLOADS
-                    DownloadEpisodeListAdapter(onEpisodeClickListener)
-                (binding.itemsRecyclerView.adapter as DownloadEpisodeListAdapter).submitList(section.items)
+                binding.itemsRecyclerView.adapter =
+                    DownloadViewItemListAdapter(onClickListener, fixedWidth = true)
+                (binding.itemsRecyclerView.adapter as DownloadViewItemListAdapter).submitList(section.items)
             } else if (section.name == "Episodes") {
                 binding.itemsRecyclerView.adapter =
-                    DownloadEpisodeListAdapter(onEpisodeClickListener)
+                    DownloadEpisodeListAdapter(onEpisodeClickListener) // TODO MAKE THIS USE A BASEITEMDTO
                 (binding.itemsRecyclerView.adapter as DownloadEpisodeListAdapter).submitList(section.items)
             }
             binding.executePendingBindings()

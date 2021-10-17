@@ -23,6 +23,7 @@ import dev.jdtech.jellyfin.utils.checkIfLoginRequired
 import dev.jdtech.jellyfin.utils.requestDownload
 import dev.jdtech.jellyfin.viewmodels.MediaInfoViewModel
 import org.jellyfin.sdk.model.api.BaseItemDto
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MediaInfoFragment : Fragment() {
@@ -69,10 +70,6 @@ class MediaInfoFragment : Fragment() {
                 viewModel.doneDownloadMedia()
             }
         })
-
-        binding.errorLayout.errorRetryButton.setOnClickListener {
-            viewModel.loadData(args.itemId, args.itemType)
-        }
 
         binding.errorLayout.errorDetailsButton.setOnClickListener {
             ErrorDialogFragment(viewModel.error.value ?: getString(R.string.unknown_error)).show(
@@ -190,31 +187,55 @@ class MediaInfoFragment : Fragment() {
                     } else {
                         viewModel.preparePlayerItems()
                     }
+                } else if (args.itemId == null) {
+                    viewModel.preparePlayerItems()
                 }
             } else if (args.itemType == "Series") {
                 viewModel.preparePlayerItems()
             }
         }
 
-        binding.checkButton.setOnClickListener {
-            when (viewModel.played.value) {
-                true -> viewModel.markAsUnplayed(args.itemId)
-                false -> viewModel.markAsPlayed(args.itemId)
+
+
+        if (args.itemId != null) {
+            binding.errorLayout.errorRetryButton.setOnClickListener {
+                viewModel.loadData(args.itemId!!, args.itemType)
             }
-        }
 
-        binding.favoriteButton.setOnClickListener {
-            when (viewModel.favorite.value) {
-                true -> viewModel.unmarkAsFavorite(args.itemId)
-                false -> viewModel.markAsFavorite(args.itemId)
+            binding.checkButton.setOnClickListener {
+                when (viewModel.played.value) {
+                    true -> viewModel.markAsUnplayed(args.itemId!!)
+                    false -> viewModel.markAsPlayed(args.itemId!!)
+                }
             }
+
+            binding.favoriteButton.setOnClickListener {
+                when (viewModel.favorite.value) {
+                    true -> viewModel.unmarkAsFavorite(args.itemId!!)
+                    false -> viewModel.markAsFavorite(args.itemId!!)
+                }
+            }
+
+            binding.downloadButton.setOnClickListener {
+                viewModel.loadDownloadRequestItem(args.itemId!!)
+            }
+
+            binding.deleteButton.visibility = View.GONE
+
+            viewModel.loadData(args.itemId!!, args.itemType)
+        } else {
+            binding.favoriteButton.visibility = View.GONE
+            binding.checkButton.visibility = View.GONE
+            binding.downloadButton.visibility = View.GONE
+
+            binding.deleteButton.setOnClickListener {
+                viewModel.deleteItem()
+                findNavController().navigate(R.id.downloadFragment)
+            }
+
+            viewModel.loadData(args.playerItem!!)
         }
 
-        binding.downloadButton.setOnClickListener {
-            viewModel.loadDownloadRequestItem(args.itemId)
-        }
-
-        viewModel.loadData(args.itemId, args.itemType)
     }
 
     private fun navigateToEpisodeBottomSheetFragment(episode: BaseItemDto) {
