@@ -54,8 +54,8 @@ fun Fragment.requestDownload(uri: Uri, downloadRequestItem: DownloadRequestItem)
         .setDescription("Downloading")
         .setDestinationUri(Uri.fromFile(File(defaultStorage, downloadRequestItem.itemId.toString())))
         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-
-    requireContext().downloadFile(downloadRequest, 1)
+    if(!File(defaultStorage, downloadRequestItem.itemId.toString()).exists())
+        requireContext().downloadFile(downloadRequest, 1)
     requireContext().createMetadataFile(downloadRequestItem.metadata, downloadRequestItem.itemId)
 }
 
