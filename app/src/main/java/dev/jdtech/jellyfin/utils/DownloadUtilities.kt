@@ -150,7 +150,7 @@ fun postDownloadPlaybackProgress(uri: String, playbackPosition: Long, playedPerc
 
 fun downloadMetadataToBaseItemDto(metadata: DownloadMetadata) : BaseItemDto {
     val userData = UserItemDataDto(playbackPositionTicks = metadata.playbackPosition ?: 0,
-        playedPercentage = metadata.playedPercentage, isFavorite = false, playCount = 0, played = false) //TODO DO SOMETHING ABOUT THE HARDCODED VALUES
+        playedPercentage = metadata.playedPercentage, isFavorite = false, playCount = 0, played = false)
 
     return BaseItemDto(id = metadata.id,
         type = metadata.type,
@@ -194,7 +194,7 @@ fun parseMetadataFile(metadataFile: List<String>) : DownloadMetadata {
             name = metadataFile[2],
             playbackPosition = metadataFile[3].toLong(),
             playedPercentage = if(metadataFile[4] == "null") {null} else {metadataFile[4].toDouble()},
-        ) //TODO CHANGE THIS TO PARSE THE FILE IF IT IS A MOVIE
+        )
     }
 
 }

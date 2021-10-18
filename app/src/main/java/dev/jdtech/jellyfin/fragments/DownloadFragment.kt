@@ -36,7 +36,7 @@ class DownloadFragment : Fragment() {
         binding.viewModel = viewModel
         binding.downloadsRecyclerView.adapter = DownloadsListAdapter(
             DownloadViewItemListAdapter.OnClickListener { item ->
-                navigateToMediaInfoFragment(item) //TODO MAKE THIS FUNCTION WORK WITH PALYERITEM
+                navigateToMediaInfoFragment(item)
             }, DownloadEpisodeListAdapter.OnClickListener { item ->
                 navigateToEpisodeBottomSheetFragment(item)
             })

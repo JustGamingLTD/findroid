@@ -26,7 +26,7 @@ class DownloadsListAdapter(
                 (binding.itemsRecyclerView.adapter as DownloadViewItemListAdapter).submitList(section.items)
             } else if (section.name == "Episodes") {
                 binding.itemsRecyclerView.adapter =
-                    DownloadEpisodeListAdapter(onEpisodeClickListener) // TODO MAKE THIS USE A BASEITEMDTO
+                    DownloadEpisodeListAdapter(onEpisodeClickListener)
                 (binding.itemsRecyclerView.adapter as DownloadEpisodeListAdapter).submitList(section.items)
             }
             binding.executePendingBindings()

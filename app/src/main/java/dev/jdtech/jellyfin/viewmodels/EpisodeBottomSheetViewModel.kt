@@ -82,7 +82,7 @@ constructor(
     fun preparePlayerItems() {
         _playerItemsError.value = null
         viewModelScope.launch {
-            if(playerItems.isEmpty()){ //TODO REPLACE THIS WITH A GOOD WAY OF DETECTING WHETHER PLAYING FROM DOWNLOADS
+            if(playerItems.isEmpty()){
                 try {
                     createPlayerItems(_item.value!!)
                     _navigateToPlayer.value = true

@@ -23,7 +23,6 @@ class DownloadEpisodeListAdapter(private val onClickListener: OnClickListener) :
                     (metadata.playedPercentage.times(2.24)).toFloat(), binding.progressBar.context.resources.displayMetrics).toInt()
                 binding.progressBar.visibility = View.VISIBLE
             }
-             //TODO MAKE THIS WORK WITH MOVIES
             if (metadata.type == "Movie") {
                 binding.primaryName.text = metadata.name
                 Timber.d(metadata.name)

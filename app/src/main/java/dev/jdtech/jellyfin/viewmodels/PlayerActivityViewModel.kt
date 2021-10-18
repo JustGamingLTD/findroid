@@ -118,7 +118,7 @@ constructor(
             player.setMediaItems(mediaItems, currentWindow, items[0].playbackPosition)
             val useMpv = sp.getBoolean("mpv_player", false)
             if(!useMpv || !playFromDownloads)
-                player.prepare() //TODO FOR SOME UNKNOWN REASON, THIS LINE CAUSES THE APP TO CRASH WHEN USING MPV AND PLAYING FROM DOWNLOADS
+                player.prepare() //TODO: This line causes a crash when playing from downloads with MPV
             player.play()
         }
 

@@ -196,7 +196,7 @@ constructor(private val jellyfinRepository: JellyfinRepository) : ViewModel() {
     fun preparePlayerItems(mediaSourceIndex: Int? = null) {
         _playerItemsError.value = null
         viewModelScope.launch {
-            if(playerItems.isEmpty()){ //TODO REPLACE THIS WITH A GOOD WAY OF DETECTING WHETHER PLAYING FROM DOWNLOADS
+            if(playerItems.isEmpty()){
                 try {
                     createPlayerItems(_item.value!!, mediaSourceIndex)
                     _navigateToPlayer.value = playerItems.toTypedArray()
