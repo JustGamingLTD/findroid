@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.jdtech.jellyfin.models.DownloadSection
 import dev.jdtech.jellyfin.repository.JellyfinRepository
 import dev.jdtech.jellyfin.utils.loadDownloadedEpisodes
+import dev.jdtech.jellyfin.utils.postDownloadPlaybackProgress
 import kotlinx.coroutines.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -37,7 +38,7 @@ constructor(
     }
 
     @SuppressLint("ResourceType")
-    fun loadData() { //TODO MAKE THIS FUNCTION SYNC THE PLAYBACK PROGRESS OF THE DOWNLOADS WITH THE SERVER BY KEEPING WHICHEVER IS HIGHEST
+    fun loadData() {
         _error.value = null
         _finishedLoading.value = false
         viewModelScope.launch {
@@ -48,7 +49,6 @@ constructor(
                     _finishedLoading.value = true
                     return@launch
                 }
-                Timber.d(items[0].metadata?.type)
                 val tempDownloadSections = mutableListOf<DownloadSection>()
                     withContext(Dispatchers.Default) {
                         DownloadSection(

@@ -162,8 +162,7 @@ constructor(
                                 Timber.e(e)
                             }
                         if(playFromDownloads){
-
-                            postDownloadPlaybackProgress(items[0].mediaSourceUri, player.currentPosition, player.currentPosition.toDouble()/player.duration.toDouble()) //TODO AUTOMATICALLY USE THE CORRECT ITEM
+                            postDownloadPlaybackProgress(items[0].mediaSourceUri, player.currentPosition, (player.currentPosition.toDouble()/player.duration.toDouble()).times(100)) //TODO Automaticcaly use the correct item
                         }
                     }
                 }

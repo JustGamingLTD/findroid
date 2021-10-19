@@ -15,6 +15,9 @@ import dev.jdtech.jellyfin.R
 import dev.jdtech.jellyfin.models.DownloadMetadata
 import dev.jdtech.jellyfin.models.DownloadRequestItem
 import dev.jdtech.jellyfin.models.PlayerItem
+import dev.jdtech.jellyfin.repository.JellyfinRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.UserItemDataDto
 import timber.log.Timber
@@ -107,9 +110,15 @@ fun Context.loadDownloadedEpisodes(): List<PlayerItem> {
     val defaultStorage = getDownloadLocation()
     defaultStorage?.walk()?.forEach {
         if (it.isFile && it.extension == "") {
-            val metadataFile = File(defaultStorage, "${it.name}.metadata").readLines()
-            val metadata = parseMetadataFile(metadataFile)
-            items.add(PlayerItem(metadata.name, UUID.fromString(it.name), "", metadata.playbackPosition!!, it.absolutePath, metadata))
+            try{
+                val metadataFile = File(defaultStorage, "${it.name}.metadata").readLines()
+                val metadata = parseMetadataFile(metadataFile)
+                items.add(PlayerItem(metadata.name, UUID.fromString(it.name), "", metadata.playbackPosition!!, it.absolutePath, metadata))
+            } catch (e: Exception) {
+                it.delete()
+                Timber.e(e)
+            }
+
         }
     }
     return items.toList()
@@ -131,10 +140,10 @@ fun postDownloadPlaybackProgress(uri: String, playbackPosition: Long, playedPerc
         val metadataArray = metadataFile.readLines().toMutableList()
         if(metadataArray[1] == "Episode"){
             metadataArray[6] = playbackPosition.toString()
-            metadataArray[7] = playedPercentage.times(100).toString()
+            metadataArray[7] = playedPercentage.toString()
         } else if (metadataArray[1] == "Movie") {
             metadataArray[3] = playbackPosition.toString()
-            metadataArray[4] = playedPercentage.times(100).toString()
+            metadataArray[4] = playedPercentage.toString()
         }
 
         metadataFile.writeText("") //This might be necessary to make sure that the metadata file is empty
@@ -196,5 +205,43 @@ fun parseMetadataFile(metadataFile: List<String>) : DownloadMetadata {
             playedPercentage = if(metadataFile[4] == "null") {null} else {metadataFile[4].toDouble()},
         )
     }
+}
 
+suspend fun Context.syncPlaybackProgress(jellyfinRepository: JellyfinRepository) {
+    val items = loadDownloadedEpisodes()
+    items.forEach(){
+        try {
+            val localPlaybackProgress = it.metadata?.playbackPosition
+            val localPlayedPercentage = it.metadata?.playedPercentage
+
+            val item = jellyfinRepository.getItem(it.itemId)
+            val remotePlaybackProgress = item.userData?.playbackPositionTicks?.div(10000)
+            val remotePlayedPercentage = item.userData?.playedPercentage
+
+            var playbackProgress: Long = 0
+            var playedPercentage = 0.0
+
+            if (localPlaybackProgress != null) {
+                if (localPlaybackProgress > playbackProgress){
+                    playbackProgress = localPlaybackProgress
+                    playedPercentage = localPlayedPercentage!!
+                }
+            }
+            if (remotePlaybackProgress != null) {
+                if (remotePlaybackProgress > playbackProgress){
+                    playbackProgress = remotePlaybackProgress
+                    playedPercentage = remotePlayedPercentage!!
+                }
+            }
+
+            if (playbackProgress != 0.toLong()) {
+                postDownloadPlaybackProgress(it.mediaSourceUri, playbackProgress, playedPercentage)
+                jellyfinRepository.postPlaybackProgress(it.itemId, playbackProgress.times(10000), false)
+                Timber.d("Percentage: $playedPercentage")
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+
+    }
 }
