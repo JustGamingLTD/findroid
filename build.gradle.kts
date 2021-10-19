@@ -23,11 +23,6 @@ buildscript {
         val aboutLibrariesVersion = "8.9.1"
         classpath("com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin:$aboutLibrariesVersion")
     }
-    android {
-        lintOptions {
-            abortOnError false
-        }
-    }
 }
 
 allprojects {
