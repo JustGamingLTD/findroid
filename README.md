@@ -1,3 +1,5 @@
+[![Android CI](https://github.com/JustGamingLTD/findroid/actions/workflows/android.yml/badge.svg)](https://github.com/JustGamingLTD/findroid/actions/workflows/android.yml)
+
 ![Findroid banner](images/findroid-banner.png)
 
 # Findroid
