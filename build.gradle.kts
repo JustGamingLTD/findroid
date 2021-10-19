@@ -8,6 +8,11 @@ buildscript {
             url = uri("https://plugins.gradle.org/m2/")
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
     dependencies {
         classpath("com.android.tools.build:gradle:7.0.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
