@@ -35,3 +35,9 @@ allprojects {
 tasks.create<Delete>("clean") {
     delete(rootProject.buildDir)
 }
+
+android {
+    lintOptions {
+        abortOnError false
+    }
+}
