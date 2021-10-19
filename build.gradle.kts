@@ -23,6 +23,11 @@ buildscript {
         val aboutLibrariesVersion = "8.9.1"
         classpath("com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin:$aboutLibrariesVersion")
     }
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
 }
 
 allprojects {
@@ -36,8 +41,4 @@ tasks.create<Delete>("clean") {
     delete(rootProject.buildDir)
 }
 
-android {
-    lintOptions {
-        abortOnError false
-    }
-}
+
