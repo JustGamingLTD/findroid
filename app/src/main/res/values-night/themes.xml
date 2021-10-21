@@ -7,7 +7,7 @@
         <item name="colorSecondaryVariant">@color/green_800</item>
 
         <!-- Background colors and error state color -->
-        <item name="android:colorBackground">@color/black</item>
+        <item name="android:colorBackground">@color/neutral_900</item>
         <item name="colorSurface">@color/neutral_900</item>
         <item name="colorError">@color/red</item>
 
