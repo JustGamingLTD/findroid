@@ -21,6 +21,7 @@ Home | Library | Movie | Season | Episode
 
 ## Features
 - Completely native interface
+- Offline playback / downloads
 - Supported media items: movies, series, seasons, episodes 
   - Direct play only, (no transcoding)
 - ExoPlayer
@@ -40,7 +41,6 @@ Home | Library | Movie | Season | Episode
 ## Planned features
 - Websocket connection (Syncplay)
 - Caching
-- Offline playback / downloads
 - Picture in picture mode
 - Chromecast support
 
